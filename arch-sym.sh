@@ -5,5 +5,6 @@ ln -sf ~/dotfiles/rofi/ ~/.config/
 ln -sf ~/dotfiles/qtile/ ~/.config/
 ln -sf ~/dotfiles/picom/ ~/.config/
 ln -sf ~/dotfiles/neofetch/ ~/.config/
+ln -sf ~/dotfiles/dunst/ ~/.config/
 
 # Install pywal qtile rofi picom
