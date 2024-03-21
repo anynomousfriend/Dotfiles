@@ -1,5 +1,5 @@
 [font]
-size = 7.5
+size = 8
 
 [font.normal]
 #family = "FiraCode Nerd Font"
@@ -7,7 +7,7 @@ family = "JetBrainsMono Nerd Font Mono"
 style = "Regular"
 
 [window]
-opacity = 0.7
+opacity = 0.8
 
 [window.padding]
 x = 15

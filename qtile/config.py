@@ -36,6 +36,18 @@ from pathlib import Path
 from libqtile.widget import backlight
 import psutil
 
+# Decor module
+from qtile_extras import widget
+from qtile_extras.widget.decorations import PowerLineDecoration
+
+
+
+# ------------------------------------------------------
+# Variable Declarations
+#-------------------------------------------------------
+
+app_launcher = "rofi -show drun -disable-history -show-icons"
+
 mod = "mod4"
 
 home = str(Path.home())
@@ -102,37 +114,68 @@ keys = [
 
     # System 
     Key([mod, "shift"], "q", lazy.spawn(home + "/.config/qtile/scripts/powermenu.sh"), desc="Open Powermenu"),
-     Key([mod], "Print", lazy.spawn(home + "/.config/qtile/scripts/screenshot.sh")),
+    # Key([mod], "Print", lazy.spawn(home + "/.config/qtile/scripts/screenshot.sh")),
 
 
     # Volume Control
 
-    Key([], "XF86AudioRaiseVolume", lazy.spawn("pactl set-sink-volume 0 +5%"), desc='Volume Up'),
-    Key([], "XF86AudioLowerVolume", lazy.spawn("pactl set-sink-volume 0 -5%"), desc='volume down'),
-    Key([], "XF86AudioMute", lazy.spawn("pulsemixer --toggle-mute"), desc='Volume Mute'),
+    Key([], "Print", lazy.spawn("flameshot gui"), desc="Take a screenshot"),
+    Key(
+        [],
+        "XF86AudioLowerVolume",
+        lazy.spawn("amixer sset Master 5%-"),
+        desc="Lower volume",
+    ),
+    Key(
+        [],
+        "XF86AudioRaiseVolume",
+        lazy.spawn("amixer sset Master 5%+"),
+        desc="Raise volume",
+    ),
+    Key(
+        [],
+        "XF86AudioMute",
+        lazy.spawn("amixer -D default set Master toggle"),
+        desc="Mute volume",
+    ),
 
 
-
-
+    Key(
+        [mod],
+        "space",
+        lazy.window.toggle_floating(),
+        desc="Toggle Floating layout",
+    ),
 
 ]
 
-groups = [Group(i) for i in "123456789"]
 
-for i in groups:
+
+
+# --------------------------------------------------------
+# Groups
+# --------------------------------------------------------
+#groups = [Group(i) for i in ["★", "★", "3★", "4★", "5★"]]
+groups = [Group(i) for i in ["󰋜", "", "", "", "󰵮","󰝚", "󰝡",""]]
+#groups = [Group(i) for i in ["","","","","","","","","",""]]
+#groups = [Group(i) for i in ["零","一","二","三","四","五","六","七","八","九"]]
+#groups = [Group(i) for i in "12345"]
+group_hotkeys = "123456789"
+
+for i, k in zip(groups, group_hotkeys):
     keys.extend(
         [
             # mod1 + letter of group = switch to group
             Key(
                 [mod],
-                i.name,
+                k,
                 lazy.group[i.name].toscreen(),
                 desc="Switch to group {}".format(i.name),
             ),
             # mod1 + shift + letter of group = switch to & move focused window to group
             Key(
                 [mod, "shift"],
-                i.name,
+                k,
                 lazy.window.togroup(i.name, switch_group=True),
                 desc="Switch to & move focused window to group {}".format(i.name),
             ),
@@ -142,6 +185,7 @@ for i in groups:
             #     desc="move focused window to group {}".format(i.name)),
         ]
     )
+# Ends here
 
 
 # --------------------------------------------------------
@@ -172,11 +216,11 @@ Color15=(colordict['colors']['color15'])
 # --------------------------------------------------------
 
 layout_theme = { 
-    "border_width": 3,
-    "margin": 10,
+    "border_width": 2,
+    "margin": 5,
     "border_focus": Color1,
     "border_normal": "FFFFFF",
-    "single_border_width": 3
+    "single_border_width": 2
 }
 
 layout_themes = {
@@ -187,116 +231,188 @@ layout_themes = {
 }
 
 
+# ------------------------------------------------------
+# PowerLineDecoration
+#-------------------------------------------------------
+
+
+arrow_powerlineRight = {
+    "decorations": [
+        PowerLineDecoration(
+            path="arrow_right",
+            size=11,
+        )
+    ]
+}
+arrow_powerlineLeft = {
+    "decorations": [
+        PowerLineDecoration(
+            path="arrow_left",
+            size=11,
+        )
+    ]
+}
+rounded_powerlineRight = {
+    "decorations": [
+        PowerLineDecoration(
+            path="rounded_right",
+            size=11,
+        )
+    ]
+}
+rounded_powerlineLeft = {
+    "decorations": [
+        PowerLineDecoration(
+            path="rouded_left",
+            size=11,
+        )
+    ]
+}
+slash_powerlineRight = {
+    "decorations": [
+        PowerLineDecoration(
+            path="forward_slash",
+            size=11,
+        )
+    ]
+}
+slash_powerlineLeft = {
+    "decorations": [
+        PowerLineDecoration(
+            path="back_slash",
+            size=11,
+        )
+    ]
+}
+
+
+
+# ------------------------------------------------------
+# Layout Configurations
+#-------------------------------------------------------
 
 layouts = [
-    #layout.Columns(border_focus_stack=["#d75f5f", "#8f3d3d"], border_width=4),
+    layout.Columns(**layout_theme),
     layout.MonadTall(**layout_theme),
     layout.Max(),
-    # Try more layouts by unleashing below layouts.
-    # layout.Stack(num_stacks=2),
-    # layout.Bsp(),
-    layout.Matrix(**layout_themes),
-    # layout.MonadWide(),
-    # layout.RatioTile(),
-    # layout.Tile(),
-    # layout.TreeTab(),
-    # layout.VerticalTile(),
-    # layout.Zoomy(),
+    # **Floating Rules Down in the code.
 ]
+
+
 
 widget_defaults = dict(
     font="JetBrainsMono Nerd Font Mono",
-    fontsize=13,
-    padding=6,
+    fontsize=15,
+    padding=5,
 )
 extension_defaults = widget_defaults.copy()
 
+
+# ------------------------------------------------------
+# Mouse Callbacks
+#-------------------------------------------------------
+
+
+
+# ------------------------------------------------------
+# Bar Configuration
+#-------------------------------------------------------
+    
 screens = [
     Screen(
         top=bar.Bar(
             [
-                
+
                 widget.GroupBox(
-                    active=Color1,
-                    border_width=8,
+                    fontsize=23,
+                    padding_x=3,
+                    padding_y=5,
+                    rounded=False,
+                    center_aligned=True,
                     disable_drag=True,
+                    borderwidth=3,
                     highlight_method="line",
-                    this_current_screen_border= Color1,
-                    #highlight_color=['#000000', '#000000'],
-                    #visible_groups=get_workspace_groups(wsp['current']),
-                    spacing=0,
+                    active=Color1,
+                    inactive=Color7,
+                    highlight_color=Color6,
+                    this_current_screen_border=Color4,
+                    this_screen_border=Color0,
+                    other_screen_border=Color11,
+                    other_current_screen_border=Color6,
+                    background=Color4,
+                    foreground=Color3,
+                    **arrow_powerlineLeft,
                 ),
+
                  widget.Prompt(
                      prompt="run: ",
                      ignore_dups_history=True,
                  ),
                  widget.WindowName(
-                    background=Color1,
                     for_current_screen=True,
-                    padding=8,
-                    foreground="FFFFFF",
+                    padding=18,
+                    foreground=Color7,
+                    background=Color3,
                 ),
-                
-                
-                # widget.CPUGraph(
-                #      width=30,
-                #      border_width=1,
-                #      graph_color=Color1,
-                #      fill_color=Color1,
-                #      border_color="#000000",
-                #      frequency=5,
-                #      line_width=1,
-                #      samples=50,
-                #  ),
-                #  widget.MemoryGraph(
-                #      width=30,
-                #      border_width=1,
-                #      graph_color=Color1,
-                #      border_color="#000000",
-                #      line_width=1,
-                #      frequency=5,
-                #      fill_color= Color1,
-                #  ), 
-                #
-                widget.Sep(linewidth=1, padding=8, foreground=Color1),
-                widget.TextBox(text="", fontsize= 14, font= "JetBrainsMono Nerd Font", foreground=Color1),
-                widget.CPU( 
-                    padding=8,
-                    format='{freq_current}GHz {load_percent}%',
-                    foreground=Color1,
-                    
-                ),
-                widget.Sep(linewidth=1, padding=8, foreground=Color1),
 
+                widget.Spacer(
+                    length=1,
+                    background=Color3,
+                    **rounded_powerlineRight,
+                ),
+                widget.CPU(
+                    padding=5,
+                    format="  {freq_current}GHz {load_percent}%",
+                    foreground=Color7,
+                    background=Color1,
+                    **slash_powerlineRight,
+                ),
+                widget.Memory(
+                    padding=5,
+                    format="󰈀 {MemUsed:.0f}{mm}",
+                    background=Color2,
+                    foreground=Color7,
+                    **slash_powerlineRight,
+                ),
+
+                widget.Clock(
+                    padding=5,
+                    foreground=Color7,
+                    background=Color4,
+                    format='  %a %d %b %I:%M %p ',
+                    **slash_powerlineRight,
+                ),
                 
                 widget.Battery(
-                    full_char="God!",
-                    not_charging_char="Shit!",
-                    charge_char= "+",
-                    discharge_char="-",
-                    empty_char="dying!",
+                    padding=5,
+                    full_char="󱊣",
+                    not_charging_char="󰂃 Shit!",
+                    charge_char= "󰂄 +",
+                    discharge_char="󰁿 -",
+                    empty_char="󰂎 dying!",
                     format= '{char} {percent:2.0%} {hour:d}:{min:02d} ',
-                    foreground=Color1,
+                    foreground=Color7,
+                    background=Color3,
+                    **slash_powerlineRight,
                 ),
-                widget.Sep(linewidth=1, padding=8, foreground=Color1),
 
-
-                widget.Volume(fontsize=10, update_interval=2),
-                widget.Systray(),
-
-                widget.Sep(linewidth=1, padding=8, foreground=Color1),
-                widget.TextBox(text="", fontsize= 14, font= "JetBrainsMono Nerd Font", foreground=Color1),
-                widget.Clock(
-                    foreground=Color1,
-                    format=' %y-%m-%d %a %I:%M %p ',
-                    padding=8,
+                widget.Volume(
+                    fmt="󰕾 {}",
+                    foreground=Color7,
+                    background=Color5,
+                    padding=10,
+                    **slash_powerlineRight,
                 ),
-                widget.Sep(linewidth=1, padding=8, foreground=Color1),
+                widget.Systray(
+                    padding=7,
+                    icon_size=15,
+                ),
+
 
                 widget.CurrentLayout(
-                    padding=8,
-                    foreground="FFFFFF",
-                    background=Color1,
+                    padding=5,
+                    foreground=Color0,
+                    background=Color6,
                 ),
                 # widget.CurrentLayoutIcon(
                 #scale=0.65,
@@ -322,18 +438,36 @@ follow_mouse_focus = True
 bring_front_click = False
 floats_kept_above = True
 cursor_warp = False
+
+# ------------------------------------------------------
+# **Floating Rules
+#-------------------------------------------------------
+
 floating_layout = layout.Floating(
+    border_width=2,
+    border_focus=Color1,
+    border_normal=Color7,
     float_rules=[
         # Run the utility of `xprop` to see the wm class and name of an X client.
         *layout.Floating.default_float_rules,
         Match(wm_class="confirmreset"),  # gitk
+        Match(wm_class="confirm"),  # gitk
         Match(wm_class="makebranch"),  # gitk
         Match(wm_class="maketag"),  # gitk
         Match(wm_class="ssh-askpass"),  # ssh-askpass
+        Match(wm_class="pavucontrol"),
+        Match(wm_class="dialog"),
+        Match(wm_class="error"),
+        Match(wm_class="file_progress"),
+        Match(wm_class="notification"),
+        Match(wm_class="splash"),
+        Match(wm_class="toolbar"),
+        Match(wm_class="download"),
         Match(title="branchdialog"),  # gitk
         Match(title="pinentry"),  # GPG key password entry
-    ]
+    ],
 )
+
 auto_fullscreen = True
 focus_on_window_activation = "smart"
 reconfigure_screens = True
@@ -361,3 +495,6 @@ def autostart():
     home = os.path.expanduser('/home/subhankar/.config/qtile/autostart.sh')
     subprocess.Popen([home])
 
+@hook.subscribe.group_window_add
+def switchtogroup(group, window):
+    group.cmd_toscreen()

@@ -3,7 +3,7 @@
 # Dependencies:
 # convert wal xdotool xwallpaper
 
-wall_dir=/home/subhankar/Pictures/wallpaper/
+wall_dir=/home/subhankar/Pictures/wallpaper/dragon-ball/
 
 wall="$(find "$wall_dir" -type f -name "*.jpg" -o -name "*.png" | shuf -n1)"
 
