@@ -38,7 +38,7 @@ import psutil
 
 # Decor module
 from qtile_extras import widget
-from qtile_extras.widget.decorations import PowerLineDecoration
+from qtile_extras.widget.decorations import (PowerLineDecoration, RectDecoration)
 
 
 
@@ -382,7 +382,8 @@ screens = [
                     format='  %a %d %b %I:%M %p ',
                     **slash_powerlineRight,
                 ),
-                
+               
+
                 widget.Battery(
                     padding=5,
                     full_char="󱊣",
@@ -395,6 +396,30 @@ screens = [
                     background=Color3,
                     **slash_powerlineRight,
                 ),
+
+                widget.Wlan(
+                  **slash_powerlineRight,
+                  interface="wlan0",
+                  format=' {essid}',
+                  disconnected_message='',
+                  foreground=Color7,
+                  background=Color9,
+                  scroll=True,
+                  scroll_repeat=True,
+                  scroll_interval=0.1,
+                  scroll_step=1,
+                  update_interval=1,
+                  mouse_callbacks={'Button1':lambda: qtile.function(network_widget)}),
+
+                 widget.Wlan(
+                   **slash_powerlineRight,
+                   interface="wlan0",
+                   format='{percent:2.0%}',
+                   disconnected_message='',
+                   foreground=Color7,
+                   background=Color9,
+                   mouse_callbacks={'Button1':lambda: qtile.function(network_widget)}
+                 ),
 
                 widget.Volume(
                     fmt="󰕾 {}",
